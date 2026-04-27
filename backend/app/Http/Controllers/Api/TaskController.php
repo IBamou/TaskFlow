@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
     // GET /api/tasks - Get all tasks for current user
     public function index(Request $request)
     {
+        Gate::authorize('view', Task::class);
         $query = Task::where('user_id', Auth::id())
             ->with('category');
 
@@ -38,6 +40,7 @@ class TaskController extends Controller
     // POST /api/tasks - Create new task
     public function store(Request $request)
     {
+        Gate::authorize('create', Task::class);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -59,20 +62,25 @@ class TaskController extends Controller
     // GET /api/tasks/{id} - Get single task
     public function show(Task $task)
     {
-        // Ensure user owns this task
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('view', $task);
 
         return response()->json($task->load('category'));
     }
 
     // PUT /api/tasks/{id} - Update task
+    public function getByCategory(Request $request)
+    {
+        Gate::authorize('view', Task::class);
+
+        $tasks = Task::where('category_id', $request->category_id)->where('user_id', Auth::id())->get();
+
+        return response()->json($tasks);
+    }
+
+    // PUT /api/tasks/{id} - Update task
     public function update(Request $request, Task $task)
     {
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('update', $task);
 
         $validated = $request->validate([
             'title' => 'string|max:255',
@@ -91,9 +99,7 @@ class TaskController extends Controller
     // DELETE /api/tasks/{id} - Delete task
     public function destroy(Task $task)
     {
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('delete', $task);
 
         $task->delete();
 
