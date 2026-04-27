@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
+    protected $fillable = [
+        'title',
+        'description',
+        'status',
+        'priority',
+        'due_date',
+        'subtasks',
+        'category_id',
+        'user_id',
+    ];
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
