@@ -12,9 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    // Auth Endpoints
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
+    // Logout Endpoint (requires auth)
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Category Endpoints
@@ -30,5 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
     Route::put('/tasks/{task}/update', [TaskController::class, 'update']);
     Route::delete('/tasks/{task}/delete', [TaskController::class, 'destroy']);
-
 });
+
+// TEMPORARY: Test routes without auth
+Route::get('/test/categories', [CategoryController::class, 'index']);
+Route::post('/test/categories/store', [CategoryController::class, 'store']);
+
+// Public Auth Endpoints
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+
